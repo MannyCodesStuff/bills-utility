@@ -54,7 +54,7 @@ export function InterStoreTransferForm({
   const departmentsToShow = [
     {
       id: 'GROCERY',
-      name: 'Grocery'
+      name: 'GROCERY'
     },
     {
       id: 'BEER',
