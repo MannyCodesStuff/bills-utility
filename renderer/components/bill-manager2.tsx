@@ -295,6 +295,7 @@ export function BillManager2() {
 
   // Invoice form submit handler
   const handleRenameAndUpload = async (data: BillsSchemaType) => {
+    setErrorMessage(undefined)
     if (!selectedPdf) {
       console.log('Please select a PDF file')
       // alert('Please select a PDF file')
@@ -397,6 +398,7 @@ export function BillManager2() {
   // Non-invoice form submit handler
   const handleUploadNonInvoice = async (data: NonInvoiceSchemaType) => {
     console.log('handleUploadNonInvoice', data)
+    setErrorMessage(undefined)
     if (!selectedPdf) {
       setErrorMessage('Please select a PDF file')
       // toast.error('Please select a PDF file')
@@ -469,6 +471,7 @@ export function BillManager2() {
     action: UploadAction
   ) => {
     console.log('handleUploadOther', data, action)
+    setErrorMessage(undefined)
     if (!selectedPdf) {
       setErrorMessage('Please select a PDF file')
       // toast.error('Please select a PDF file')
@@ -545,6 +548,7 @@ export function BillManager2() {
   }
 
   const handleUploadCreditMemo = async (data: CreditMemoSchemaType) => {
+    setErrorMessage(undefined)
     if (!selectedPdf) {
       console.log('Please select a PDF file')
       return
@@ -635,6 +639,7 @@ export function BillManager2() {
   const handleUploadInterStoreTransfer = async (
     data: InterStoreTransferSchemaType
   ) => {
+    setErrorMessage(undefined)
     if (!selectedPdf) {
       setErrorMessage('Please select a PDF file')
       // toast.error('Please select a PDF file')
@@ -712,8 +717,8 @@ export function BillManager2() {
       const result = await deleteFile(serverPort, { filePath })
 
       if (result.error) {
-        setErrorMessage(`Failed delete: ${result.message}`)
-        // toast.error(`Failed delete: ${result.message}`, { id: toastId })
+        // setErrorMessage(`Failed delete: ${result.message}`)
+        toast.error(`Failed delete: ${result.message}`, { id: toastId })
         return
       }
 
@@ -729,13 +734,13 @@ export function BillManager2() {
         await fetchPdfFiles(activeTab, directoryPaths[activeTab])
       }
     } catch (error) {
-      setErrorMessage(
-        `Delete error: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
-      // toast.error(
-      //   `Delete error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      //   { id: toastId }
+      // setErrorMessage(
+      //   `Delete error: ${error instanceof Error ? error.message : 'Unknown error'}`
       // )
+      toast.error(
+        `Delete error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        { id: toastId }
+      )
     } finally {
       setDeletingPdf(undefined)
     }
