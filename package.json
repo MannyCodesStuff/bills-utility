@@ -187,6 +187,7 @@
       "allowElevation": true,
       "createDesktopShortcut": false,
       "createStartMenuShortcut": true,
+      "runAfterFinish": false,
       "installerLanguages": [
         "en_US"
       ],
