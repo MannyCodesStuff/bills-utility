@@ -916,7 +916,7 @@ function setupAutoUpdaterEvents() {
               dialog.showMessageBox(mainWindowRef, {
                 type: 'info',
                 title: 'About Bills Utility',
-                message: `Bills Utility v${app.getVersion()}\n\nA utility application for managing bills and documents.\n\nDeveloped by DeCicco & Sons`,
+                message: `Bills Utility v${app.getVersion()}\n\nA utility application for managing bills and documents.\n\nDeveloped by DevOps Team - DeCicco & Sons`,
                 buttons: ['OK']
               })
             }
