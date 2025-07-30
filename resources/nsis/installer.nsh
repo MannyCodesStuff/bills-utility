@@ -98,18 +98,41 @@ Function InstallCertificate
         
         DetailPrint "DeCicco certificate not found, proceeding with installation..."
         
-        # Install certificate silently (both auto-updates and initial installation)
-        DetailPrint "Installing certificate silently to current user's certificate store..."
-        nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& \"$R1\" -CertificatePath \"$R0\""'
-        Pop $R3
-        
-        ${If} $R3 == 0
-            DetailPrint "Certificate installed successfully!"
-            # Silent success - no dialog needed
+        ${If} $R7 == "true"
+            # Auto-update: Install certificate silently
+            DetailPrint "Auto-update detected: Installing certificate silently..."
+            nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& \"$R1\" -CertificatePath \"$R0\""'
+            Pop $R3
+            
+            ${If} $R3 == 0
+                DetailPrint "Certificate installed successfully during auto-update!"
+            ${Else}
+                DetailPrint "Certificate installation failed during auto-update (Error: $R3)"
+                # Even during auto-update, show error dialog for troubleshooting
+                MessageBox MB_ICONEXCLAMATION "Certificate Installation Failed$\n$\nError Code: $R3$\n$\nAuto-updates may show security warnings.$\n$\nYou can manually install the certificate from:$\n$INSTDIR\resources\certificates\"
+            ${EndIf}
         ${Else}
-            DetailPrint "Certificate installation failed (Error: $R3)"
-            # Show error dialog for troubleshooting
-            MessageBox MB_ICONEXCLAMATION "Certificate Installation Failed$\n$\nError Code: $R3$\n$\nThe app will still work, but you may see security warnings during updates.$\n$\nYou can manually install the certificate later by running:$\n$INSTDIR\resources\certificates\install-certificate.ps1"
+            # First-time installation: Show informative dialog for internal employees
+            DetailPrint "First-time installation detected: Requesting certificate installation..."
+            MessageBox MB_ICONINFORMATION|MB_YESNO "DeCicco & Sons Certificate Installation$\n$\nFor company employees: This will install the DeCicco & Sons certificate to enable seamless automatic updates.$\n$\n✓ No administrator privileges required$\n✓ Installs to your user account only$\n✓ Eliminates security warnings$\n✓ Enables automatic app updates$\n$\nRecommended for all company employees.$\n$\nInstall certificate now?" IDYES install_cert IDNO skip_cert
+            
+            install_cert:
+                DetailPrint "Installing certificate for current user..."
+                nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& \"$R1\" -CertificatePath \"$R0\""'
+                Pop $R3
+                
+                ${If} $R3 == 0
+                    DetailPrint "Certificate installed successfully!"
+                    MessageBox MB_ICONINFORMATION "Certificate Installation Successful!$\n$\n✓ DeCicco & Sons certificate installed$\n✓ Automatic updates enabled$\n✓ No more security warnings$\n$\nYour Bills Utility app is now ready for seamless updates."
+                ${Else}
+                    DetailPrint "Certificate installation failed (Error: $R3)"
+                    MessageBox MB_ICONEXCLAMATION "Certificate Installation Failed$\n$\nError Code: $R3$\n$\nThe app will still work normally, but you may see security warnings during automatic updates.$\n$\nTo install manually later:$\n1. Navigate to: $INSTDIR\resources\certificates\$\n2. Run: install-certificate.ps1"
+                ${EndIf}
+                Goto cert_done
+            
+            skip_cert:
+                DetailPrint "Certificate installation declined by user."
+                MessageBox MB_ICONINFORMATION "Certificate Installation Skipped$\n$\nThe Bills Utility app will work normally, but you may see security warnings during automatic updates.$\n$\nTo install the certificate later:$\n• Navigate to: $INSTDIR\resources\certificates\$\n• Run: install-certificate.ps1$\n$\nOr contact IT support for assistance."
         ${EndIf}
     ${Else}
         DetailPrint "Certificate file not found: $R0"

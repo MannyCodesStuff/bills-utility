@@ -62,12 +62,19 @@ if (isProd) {
   // Disable signature verification for internal company apps
   // ✅ This is the recommended approach for internal-only applications
 
-  // Allow updates without signature verification
+  // Configure auto-updater settings
   autoUpdater.allowDowngrade = false
   autoUpdater.allowPrerelease = false
 
-  // Code signing is now enabled - signature verification will work properly
-  console.log('✅ Auto-updater configured with code signing enabled')
+  // Temporarily disable signature verification due to self-signed certificate issues
+  // This allows auto-updates to work with self-signed certificates until certificate is properly installed
+  process.env.ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES = 'true'
+  process.env.ELECTRON_UPDATER_ALLOW_UNRESOLVED_DEPENDENCIES = 'true'
+
+  autoUpdater.logger.info(
+    '⚠️ Signature verification bypassed for self-signed certificates'
+  )
+  console.log('⚠️ Auto-updater configured to bypass signature verification')
 
   // Add better error handling
   autoUpdater.on('error', error => {

@@ -1,7 +1,7 @@
 {
   "name": "bills-utility",
   "description": "Bills Utility App",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "author": "Manny Soto Ruiz <emmanuel@deciccos.com>",
   "main": "app/background.js",
   "license": "MIT",
@@ -185,9 +185,9 @@
       "deleteAppDataOnUninstall": true,
       "differentialPackage": true,
       "allowElevation": false,
-      "createDesktopShortcut": false,
+      "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "runAfterFinish": false,
+      "runAfterFinish": true,
       "installerLanguages": [
         "en_US"
       ],
