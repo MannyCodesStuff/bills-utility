@@ -162,7 +162,7 @@
       "repo": "bills-utility",
       "releaseType": "release"
     },
-    "forceCodeSigning": true,
+    "forceCodeSigning": false,
     "compression": "store",
     "removePackageScripts": true,
     "win": {
@@ -176,8 +176,7 @@
         }
       ],
       "publisherName": "DeCicco & Sons",
-      "requestedExecutionLevel": "asInvoker",
-      "certificateSubjectName": "DeCicco & Sons"
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
