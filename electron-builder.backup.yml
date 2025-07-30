@@ -1,0 +1,38 @@
+appId: com.deciccos.bills-utility
+productName: Bills Utility
+copyright: Copyright © 2025 Manny Soto Ruiz
+directories:
+  output: dist
+  buildResources: resources
+icon: resources/icon
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+publish:
+  provider: github
+  owner: MannyCodesStuff
+  repo: bills-utility
+win:
+  target:
+    - target: nsis
+      arch: [x64, ia32]
+  publisherName: DeCicco & Sons
+  requestedExecutionLevel: asInvoker
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: true
+mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  category: public.app-category.business
+linux:
+  target:
+    - deb
+    - rpm
+    - snap
+  category: Utility

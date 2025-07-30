@@ -1,0 +1,37 @@
+# dependencies
+node_modules
+nextron-shadcn-app
+
+# logs
+*.log
+
+# next.js
+.next
+next-env.d.ts
+
+# build
+/application_build
+dist
+app
+/app
+resources
+/resources
+
+# env
+/server/env
+server/env
+
+# .env
+.env
+server/.env
+server/env/.env
+
+# Code signing certificates
+*.pfx
+*.p12
+*.cer
+*.crt
+create-certificate.ps1
+INSTALLATION_GUIDE.md
+create-certificate.ps1
+setup-environment-variables.ps1

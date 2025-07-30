@@ -1,0 +1,22 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../dist/types/**/*.ts",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    "../app/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "strictNullChecks": true
+  }
+}
