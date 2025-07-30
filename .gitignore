@@ -26,11 +26,12 @@ server/env
 server/.env
 server/env/.env
 
-# Code signing certificates
+# Code signing certificates (keep private keys secure)
 *.pfx
 *.p12
-*.cer
 *.crt
+# Allow public certificates needed for distribution
+!DeCiccoCodeSigning.cer
 create-certificate.ps1
 INSTALLATION_GUIDE.md
 create-certificate.ps1
