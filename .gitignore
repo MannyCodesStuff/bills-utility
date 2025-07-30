@@ -14,8 +14,9 @@ next-env.d.ts
 dist
 app
 /app
-resources
-/resources
+
+# Allow resources directory but ignore downloaded node binaries
+resources/node/
 
 # env
 /server/env
