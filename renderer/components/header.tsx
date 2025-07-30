@@ -185,7 +185,7 @@ export const Header = () => {
             width={60}
             height={60}
           />
-          <h1 className="text-xl font-semibold">Bills Utility</h1>
+          <h1 className="text-xl font-semibold">BillsUtility</h1>
         </div>
         <div className="flex items-center gap-4">
           <Popover
