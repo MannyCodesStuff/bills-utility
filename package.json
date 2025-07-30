@@ -184,10 +184,11 @@
       "allowToChangeInstallationDirectory": false,
       "deleteAppDataOnUninstall": true,
       "differentialPackage": true,
-      "allowElevation": true,
+      "allowElevation": false,
       "createDesktopShortcut": false,
       "createStartMenuShortcut": true,
       "runAfterFinish": false,
+      "multiUserInstall": false,
       "installerLanguages": [
         "en_US"
       ],

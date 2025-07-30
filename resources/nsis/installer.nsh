@@ -35,25 +35,45 @@ FunctionEnd
 Function IsCertificateInstalled
     DetailPrint "Checking if DeCicco certificate is already installed..."
     
-    # Check both user and machine certificate stores
-    nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "$userCert = Get-ChildItem -Path Cert:\CurrentUser\TrustedPublisher -ErrorAction SilentlyContinue | Where-Object {$_.Subject -like \"*DeCicco*\"} | Select-Object -First 1; $machineCert = Get-ChildItem -Path Cert:\LocalMachine\TrustedPublisher -ErrorAction SilentlyContinue | Where-Object {$_.Subject -like \"*DeCicco*\"} | Select-Object -First 1; if ($userCert -or $machineCert) { exit 0 } else { exit 1 }"'
+    # More robust certificate checking with detailed output
+    nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "try { $userCert = Get-ChildItem -Path Cert:\CurrentUser\TrustedPublisher -ErrorAction SilentlyContinue | Where-Object {$_.Subject -like \"*DeCicco*\"} | Select-Object -First 1; $machineCert = Get-ChildItem -Path Cert:\LocalMachine\TrustedPublisher -ErrorAction SilentlyContinue | Where-Object {$_.Subject -like \"*DeCicco*\"} | Select-Object -First 1; if ($userCert) { Write-Host \"Found DeCicco certificate in CurrentUser store\"; exit 0 } elseif ($machineCert) { Write-Host \"Found DeCicco certificate in LocalMachine store\"; exit 0 } else { Write-Host \"No DeCicco certificate found in any store\"; exit 1 } } catch { Write-Host \"Error checking certificates: $_\"; exit 2 }"'
     Pop $R9
     
-    # $R9 = 0 means certificate found, $R9 = 1 means not found
+    # $R9 = 0 means certificate found, $R9 = 1 means not found, $R9 = 2 means error
+    DetailPrint "Certificate check result: $R9"
     Push $R9
 FunctionEnd
 
 # Function to install DeCicco certificate
 Function InstallCertificate
     # Check if this is a silent installation (auto-update)
+    # Auto-updates typically run with /S, /SILENT, or --updated flags
     ${GetParameters} $R8
     ClearErrors
+    
+    # Check for various silent installation flags
     ${GetOptions} $R8 "/S" $R7
-    ${If} ${Errors}
-        StrCpy $R7 "false"  # Not silent
-    ${Else}
-        StrCpy $R7 "true"   # Silent installation
+    ${IfNot} ${Errors}
+        StrCpy $R7 "true"   # Found /S flag
+        Goto silent_detected
     ${EndIf}
+    
+    ${GetOptions} $R8 "/SILENT" $R7  
+    ${IfNot} ${Errors}
+        StrCpy $R7 "true"   # Found /SILENT flag
+        Goto silent_detected
+    ${EndIf}
+    
+    ${GetOptions} $R8 "--updated" $R7
+    ${IfNot} ${Errors}
+        StrCpy $R7 "true"   # Found --updated flag (electron-updater)
+        Goto silent_detected
+    ${EndIf}
+    
+    # No silent flags found - this is an interactive installation
+    StrCpy $R7 "false"
+    
+    silent_detected:
     
     # Get installation directory
     StrCpy $R0 "$INSTDIR\resources\certificates\DeCiccoCodeSigning.cer"
@@ -67,52 +87,34 @@ Function InstallCertificate
         
         ${If} $R9 == 0
             DetailPrint "DeCicco certificate is already installed, skipping installation."
-            ${If} $R7 == "false"
-                # Only show message if not silent installation
-                MessageBox MB_ICONINFORMATION "DeCicco & Sons certificate is already installed.$\n$\nAutomatic updates will work without security warnings."
-            ${EndIf}
+            # Silent operation - no dialog for "already installed" since user wants silent operation
+            Goto cert_done
+        ${ElseIf} $R9 == 2
+            DetailPrint "Error occurred while checking certificate status."
+            # Always show error dialogs for troubleshooting
+            MessageBox MB_ICONEXCLAMATION "Certificate Check Error$\n$\nUnable to verify certificate status.$\n$\nThe certificate installation will be skipped.$\n$\nYou can manually install it later from:$\n$INSTDIR\resources\certificates\"
             Goto cert_done
         ${EndIf}
         
         DetailPrint "DeCicco certificate not found, proceeding with installation..."
         
-        ${If} $R7 == "true"
-            # Silent installation - install certificate automatically without prompts
-            DetailPrint "Auto-update detected: Installing certificate silently..."
-            nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& \"$R1\" -CertificatePath \"$R0\""'
-            Pop $R3
-            
-            ${If} $R3 == 0
-                DetailPrint "Certificate installed successfully during auto-update!"
-            ${Else}
-                DetailPrint "Certificate installation failed during auto-update (Error: $R3)"
-            ${EndIf}
+        # Install certificate silently (both auto-updates and initial installation)
+        DetailPrint "Installing certificate silently to current user's certificate store..."
+        nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& \"$R1\" -CertificatePath \"$R0\""'
+        Pop $R3
+        
+        ${If} $R3 == 0
+            DetailPrint "Certificate installed successfully!"
+            # Silent success - no dialog needed
         ${Else}
-            # Interactive installation - ask user
-            DetailPrint "Installing certificate to current user's certificate store..."
-            MessageBox MB_ICONQUESTION|MB_YESNO "Certificate Installation$\n$\nTo enable automatic updates without security warnings, the DeCicco & Sons certificate will be installed to your user account.$\n$\nNo administrator privileges are required.$\n$\nWould you like to install it now?" IDYES install_cert IDNO skip_cert
-            
-            install_cert:
-                DetailPrint "Installing certificate for current user..."
-                # Install using PowerShell without elevation
-                nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& \"$R1\" -CertificatePath \"$R0\""'
-                Pop $R3
-                
-                ${If} $R3 == 0
-                    DetailPrint "Certificate installed successfully!"
-                    MessageBox MB_ICONINFORMATION "Certificate installed successfully!$\n$\nThe app will now receive automatic updates without security warnings for your user account."
-                ${Else}
-                    DetailPrint "Certificate installation failed (Error: $R3)"
-                    MessageBox MB_ICONEXCLAMATION "Certificate installation failed.$\n$\nThe app will still work, but you may see security warnings during updates.$\n$\nYou can install the certificate later by running install-certificate.ps1"
-                ${EndIf}
-                Goto cert_done
-            
-            skip_cert:
-                DetailPrint "Certificate installation skipped by user."
-                MessageBox MB_ICONINFORMATION "Certificate installation skipped.$\n$\nThe app will still work, but you may see security warnings during updates.$\n$\nYou can install the certificate later from:$\n$INSTDIR\resources\certificates\"
+            DetailPrint "Certificate installation failed (Error: $R3)"
+            # Show error dialog for troubleshooting
+            MessageBox MB_ICONEXCLAMATION "Certificate Installation Failed$\n$\nError Code: $R3$\n$\nThe app will still work, but you may see security warnings during updates.$\n$\nYou can manually install the certificate later by running:$\n$INSTDIR\resources\certificates\install-certificate.ps1"
         ${EndIf}
     ${Else}
         DetailPrint "Certificate file not found: $R0"
+        # Show error dialog for missing certificate file
+        MessageBox MB_ICONEXCLAMATION "Certificate File Missing$\n$\nThe certificate file was not found:$\n$R0$\n$\nThe app will still work, but you may see security warnings during updates."
     ${EndIf}
     
     cert_done:
