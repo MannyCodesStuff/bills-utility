@@ -18,9 +18,11 @@ app
 # Allow resources directory but ignore downloaded node binaries
 resources/node/
 
-# env
-/server/env
-server/env
+# Environment files
+# Ignore actual .env files with secrets
+env/.env
+server/.env
+server/env/.env
 
 # .env
 .env

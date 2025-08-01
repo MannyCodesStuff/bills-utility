@@ -3,17 +3,14 @@ import axios from 'axios'
 import { DocumentType } from '@/components/bill-manager/types'
 import { StoreId } from '@/hooks/use-store'
 
-export const renameFile = async (
-  serverPort: number,
-  data: {
-    filePath: string
-    newFileName: string
-    documentType: string
-    vendorId?: string
-    invoiceNumber?: string
-    invoiceDate?: string
-  }
-) => {
+export const renameFile = async (data: {
+  filePath: string
+  newFileName: string
+  documentType: string
+  vendorId?: string
+  invoiceNumber?: string
+  invoiceDate?: string
+}) => {
   // const response = await fetch(
   //   `http://localhost:${serverPort}/rename-document`,
   //   {
@@ -64,18 +61,15 @@ export const renameFile = async (
   }
 }
 
-export const uploadFileToSharePoint = async (
-  serverPort: number,
-  data: {
-    filePath: string
-    vendorId: string
-    invoiceNumber: string
-    invoiceDate: string
-    documentType: 'invoice' | 'credit-memo'
-    store: StoreId
-    invoiceTotal: number
-  }
-) => {
+export const uploadFileToSharePoint = async (data: {
+  filePath: string
+  vendorId: string
+  invoiceNumber: string
+  invoiceDate: string
+  documentType: 'invoice' | 'credit-memo'
+  store: StoreId
+  invoiceTotal: number
+}) => {
   // const uploadResponse = await fetch(
   //   `http://localhost:${serverPort}/upload-pdf`,
   //   {
@@ -117,14 +111,11 @@ export const uploadFileToSharePoint = async (
   }
 }
 
-export const moveFileToZDrive = async (
-  serverPort: number,
-  data: {
-    filePath: string
-    directoryPath: string
-    documentType: DocumentType
-  }
-): Promise<
+export const moveFileToZDrive = async (data: {
+  filePath: string
+  directoryPath: string
+  documentType: DocumentType
+}): Promise<
   | {
       success: true
       data: {
@@ -228,21 +219,15 @@ export const moveFileToZDrive = async (
 //   }
 // }
 
-export const deleteFile = async (
-  serverPort: number,
-  data: { filePath: string }
-) => {
+export const deleteFile = async (data: { filePath: string }) => {
   try {
-    const response = await axios.delete(
-      `http://localhost:${serverPort}/delete-file`,
-      {
-        data, // axios allows sending body in DELETE requests
-        timeout: 10000, // optional: 10-second timeout
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    const response = await axios.delete(`http://localhost:5000/delete-file`, {
+      data, // axios allows sending body in DELETE requests
+      timeout: 10000, // optional: 10-second timeout
+      headers: {
+        'Content-Type': 'application/json'
       }
-    )
+    })
 
     return {
       success: true,

@@ -1,7 +1,12 @@
 import path from 'path'
+
+// Load environment variables - MUST be early in the file
+const envPath = path.join(__dirname, '..', 'env', '.env')
+require('dotenv').config({ path: envPath, override: true })
+
 import * as fs from 'fs'
 import mssql from 'mssql'
-import * as http from 'http'
+// import * as http from 'http'
 import serve from 'electron-serve'
 import { spawn } from 'child_process'
 import { createWindow } from './helpers'
@@ -27,6 +32,35 @@ import {
   uploadToSharePoint
 } from './helpers/util'
 
+if (
+  !process.env.DB_USER ||
+  !process.env.DB_PASSWORD ||
+  !process.env.DB_SERVER ||
+  !process.env.DB_NAME ||
+  !process.env.SHAREPOINT_TENANT_ID ||
+  !process.env.SHAREPOINT_CLIENT_ID ||
+  !process.env.SHAREPOINT_CLIENT_SECRET ||
+  !process.env.SHAREPOINT_SITE_NAME ||
+  !process.env.SHAREPOINT_SITE_DOMAIN
+) {
+  console.error('❌ Missing required database environment variables!')
+  console.error('Expected .env file location:', envPath)
+  console.error(
+    'Please ensure the .env file exists with all required database variables.'
+  )
+
+  // Show error dialog to user
+  app.whenReady().then(() => {
+    dialog.showErrorBox(
+      'Configuration Error',
+      `Missing database configuration!\n\nPlease ensure the .env file exists at:\n${envPath}\n\nWith the required database variables:\nDB_USER, DB_PASSWORD, DB_SERVER, DB_NAME`
+    )
+    app.quit()
+  })
+
+  throw new Error('Missing required database environment variables')
+}
+
 export const dbConfig: mssql.config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -44,6 +78,15 @@ export const dbConfig: mssql.config = {
     acquireTimeoutMillis: 30000 // Wait up to 30s to get a free connection
   },
   requestTimeout: 120000
+}
+
+export const sharePointConfig = {
+  tenantId: process.env.SHAREPOINT_TENANT_ID,
+  clientId: process.env.SHAREPOINT_CLIENT_ID,
+  clientSecret: process.env.SHAREPOINT_CLIENT_SECRET,
+  siteName: process.env.SHAREPOINT_SITE_NAME,
+  siteDomain: process.env.SHAREPOINT_SITE_DOMAIN,
+  libraryName: 'Documents'
 }
 
 // const isProd = process.env.NODE_ENV === 'production'

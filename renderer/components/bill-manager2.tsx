@@ -29,7 +29,6 @@ import {
   UploadAction,
   TabType,
   PdfFile
-  // useSharedPdfDisplay
 } from './bill-manager'
 import {
   deleteFile,
@@ -39,14 +38,8 @@ import {
 } from '@/actions/documentManager'
 
 export function BillManager2() {
-  // const [pdfFiles, setPdfFiles] = useState<PdfFilesState>({
-  //   scans: [],
-  //   bills: [],
-  //   'non-invoice': []
-  // })
   const [loading, setLoading] = useState(true)
   const [filterQuery, setFilterQuery] = useState('')
-  const [serverPort, setServerPort] = useState(5000)
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [vendorsLoading, setVendorsLoading] = useState(true)
   const [documentType, setDocumentType] = useState<DocumentType | null>(null)
@@ -62,29 +55,6 @@ export function BillManager2() {
     setErrorMessage,
     setIsActionLoading
   } = useStore()
-
-  // Option: Shared PDF display hook for coordinated blob URL management
-  // Uncomment to use the optimized approach where file list and viewer share blob URLs
-  // const sharedPdf = useSharedPdfDisplay()
-
-  // Example of handling PDF selection with shared approach:
-  // const handlePdfSelection = async (pdf: PdfFile) => {
-  //   setSelectedPdf(pdf)
-
-  //   // Option A: Current approach - each component handles its own blob URL
-  //   // (This is what you currently have and it works fine)
-
-  //   // Option B: Shared approach - one blob URL shared between components
-  //   // Uncomment the lines below to use the shared approach:
-
-  //   // try {
-  //   //   await sharedPdf.loadPdf(pdf.originalPath)
-  //   //   console.log('Shared PDF URL ready:', sharedPdf.url)
-  //   // } catch (error) {
-  //   //   console.error('Failed to load shared PDF:', error)
-  //   //   toast.error('Failed to load PDF for preview')
-  //   // }
-  // }
 
   // Form for Invoice documents
   const invoiceForm = useForm<BillsSchemaType>({
@@ -151,10 +121,6 @@ export function BillManager2() {
           [type]: false
         }))
         setSelectedPdf(null)
-        // setPdfFiles(prev => ({
-        //   ...prev,
-        //   [type]: []
-        // }))
         setPdfFiles([])
         setLoading(false)
         return
@@ -192,66 +158,14 @@ export function BillManager2() {
             }))
           }
         }
-
-        // const response = await fetch(
-        //   `http://localhost:${serverPort}/list-pdfs`,
-        //   {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({ directory: directoryPath })
-        //   }
-        // )
-
-        // if (!response.ok) {
-        //   // setPdfFiles(prev => ({
-        //   //   ...prev,
-        //   //   [type]: []
-        //   // }))
-        //   setPdfFiles([])
-        //   setLoading(false)
-        //   // console.log(type, 'FALSE')
-        //   setDirectoryExists(prev => ({
-        //     ...prev,
-        //     [type]: false
-        //   }))
-        //   return
-        // }
-
-        // const jsonData = await response.json()
-        // console.log('jsonData', { jsonData })
-
-        // const validData = Array.isArray(jsonData.data) ? jsonData.data : []
-        // setDirectoryExists(prev => ({
-        //   ...prev,
-        //   [type]: jsonData.folderExists
-        // }))
-        // // console.log(type, jsonData.folderExists)
-
-        // // setPdfFiles(prev => ({
-        // //   ...prev,
-        // //   [type]: validData
-        // // }))
-        // setPdfFiles(validData)
-
-        // if (validData.length > 0) {
-        //   setSelectedPdf(validData[0])
-        // } else {
-        //   setSelectedPdf(null)
-        // }
       } catch (err) {
         console.log(`Error fetching ${type} files:`, err)
-        // setPdfFiles(prev => ({
-        //   ...prev,
-        //   [type]: []
-        // }))
         setPdfFiles([])
       } finally {
         setLoading(false)
       }
     },
-    [serverPort, setDirectoryExists, setSelectedPdf, setPdfFiles]
+    [setDirectoryExists, setSelectedPdf, setPdfFiles]
   )
 
   // Update form filePath when selectedPdf changes
@@ -272,33 +186,6 @@ export function BillManager2() {
       )
     }
   }, [documentType, nonInvoiceForm])
-
-  // Load the server port from settings
-  useEffect(() => {
-    async function loadSettings() {
-      try {
-        if (typeof window !== 'undefined' && window.ipc) {
-          const port = await window.ipc.getServerPort()
-          setServerPort(port)
-          console.log(`http://localhost:${port}/list-pdfs`)
-
-          const unsubscribe = window.ipc.onServerStatusChange(status => {
-            if (status.status === 'ready' && status.port) {
-              setServerPort(status.port)
-            }
-          })
-
-          return () => {
-            unsubscribe()
-          }
-        }
-      } catch (err) {
-        console.log('Failed to load settings:', err)
-      }
-    }
-
-    loadSettings()
-  }, [])
 
   // Fetch vendors from database
   useEffect(() => {
@@ -369,7 +256,7 @@ export function BillManager2() {
       // const originalPath = selectedPdf.originalPath
 
       // Step 1: Rename file
-      const renameResult = await renameFile(serverPort, {
+      const renameResult = await renameFile({
         filePath: selectedPdf.originalPath,
         newFileName,
         documentType: documentType!,
@@ -389,7 +276,7 @@ export function BillManager2() {
       setSelectedPdf(updatedPdf)
 
       // Step 2: Move file to ZDrive
-      const moveResult = await moveFileToZDrive(serverPort, {
+      const moveResult = await moveFileToZDrive({
         filePath: renameResult.data!.newPath!,
         directoryPath:
           documentType === 'invoice'
@@ -406,7 +293,7 @@ export function BillManager2() {
 
       // Step 3: Upload file to SharePoint
       if (documentType === 'invoice') {
-        const uploadResult = await uploadFileToSharePoint(serverPort, {
+        const uploadResult = await uploadFileToSharePoint({
           filePath: newFilePath,
           vendorId,
           invoiceNumber,
@@ -471,7 +358,7 @@ export function BillManager2() {
       const formattedDate = data.date.toISOString().split('T')[0]
       const newFileName = `${data.documentType}_${formattedDate}.pdf`
 
-      const renameResult = await renameFile(serverPort, {
+      const renameResult = await renameFile({
         filePath: selectedPdf.originalPath,
         newFileName,
         documentType: data.documentType
@@ -487,7 +374,7 @@ export function BillManager2() {
       }
       setSelectedPdf(updatedPdf)
 
-      const moveResult = await moveFileToZDrive(serverPort, {
+      const moveResult = await moveFileToZDrive({
         filePath: renameResult.data!.newPath!,
         directoryPath: directoryPaths['non-invoice'],
         documentType: data.documentType
@@ -549,7 +436,7 @@ export function BillManager2() {
 
       // Rename file action
       if (action === 'rename') {
-        const renameResult = await renameFile(serverPort, {
+        const renameResult = await renameFile({
           filePath: selectedPdf.originalPath,
           newFileName,
           documentType: data.documentType
@@ -561,7 +448,7 @@ export function BillManager2() {
 
         // Move file to ZDrive action
       } else if (action === 'upload') {
-        const moveResult = await moveFileToZDrive(serverPort, {
+        const moveResult = await moveFileToZDrive({
           filePath: selectedPdf.originalPath,
           directoryPath: directoryPaths['non-invoice'],
           documentType: data.documentType
@@ -622,7 +509,7 @@ export function BillManager2() {
         newFileName = `${data.vendorId}_${data.documentType}_${creditMemoNumber}_${formattedDate}.pdf`
       }
 
-      const renameResult = await renameFile(serverPort, {
+      const renameResult = await renameFile({
         filePath: selectedPdf.originalPath,
         newFileName,
         documentType: data.documentType
@@ -639,7 +526,7 @@ export function BillManager2() {
       setSelectedPdf(updatedPdf)
 
       // Step 2: Move file to ZDrive
-      const moveResult = await moveFileToZDrive(serverPort, {
+      const moveResult = await moveFileToZDrive({
         filePath: renameResult.data!.newPath!,
         directoryPath: directoryPaths['bills'],
         documentType: 'credit-memo'
@@ -652,7 +539,7 @@ export function BillManager2() {
       const newFilePath = moveResult.data.newPath
 
       // Step 3: Upload file to SharePoint
-      const uploadResult = await uploadFileToSharePoint(serverPort, {
+      const uploadResult = await uploadFileToSharePoint({
         filePath: newFilePath,
         vendorId: data.vendorId,
         invoiceNumber: data.creditMemoNumber || '',
@@ -711,7 +598,7 @@ export function BillManager2() {
       const formattedDate = data.invoiceDate.toISOString().split('T')[0]
       const newFileName = `${data.documentType}_${data.storeFrom}_${data.storeTo}-${data.departmentTo}_${formattedDate}.pdf`
 
-      const renameResult = await renameFile(serverPort, {
+      const renameResult = await renameFile({
         filePath: selectedPdf.originalPath,
         newFileName,
         documentType: data.documentType
@@ -728,7 +615,7 @@ export function BillManager2() {
       setSelectedPdf(updatedPdf)
 
       // Step 2: Move file to ZDrive Non-Invoice
-      const moveResult = await moveFileToZDrive(serverPort, {
+      const moveResult = await moveFileToZDrive({
         filePath: renameResult.data!.newPath!,
         directoryPath: directoryPaths['non-invoice'],
         documentType: data.documentType
@@ -772,7 +659,7 @@ export function BillManager2() {
     const toastId = toast.loading('Deleting file...')
 
     try {
-      const result = await deleteFile(serverPort, { filePath })
+      const result = await deleteFile({ filePath })
 
       if (result.error) {
         // setErrorMessage(`Failed delete: ${result.message}`)
@@ -828,18 +715,11 @@ export function BillManager2() {
         {/* PDF File List Sidebar */}
         <div className={`col-span-3 transition-all duration-300`}>
           <PdfFileList
-            // pdfFiles={pdfFiles}
             loading={loading}
             filterQuery={filterQuery}
             setFilterQuery={setFilterQuery}
             onRefresh={handleRefresh}
             onDelete={handleDeletePdf}
-            // pdfFiles2={pdfFiles2}
-            // Option: Use shared PDF selection handler
-            // onPdfLoaded={(pdfState) => {
-            //   console.log('PDF loaded in file list:', pdfState)
-            //   // The shared blob URL is now available in sharedPdf.url
-            // }}
           />
         </div>
 
