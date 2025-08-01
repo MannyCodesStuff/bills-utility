@@ -19,8 +19,8 @@ app
 resources/node/
 
 # Environment files
-# Ignore actual .env files with secrets
-env/.env
+# Allow env/.env for internal company deployment
+# env/.env
 server/.env
 server/env/.env
 

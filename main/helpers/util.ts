@@ -1,5 +1,5 @@
 import mssql from 'mssql'
-import { dbConfig, sharePointConfig } from '../background'
+import { dbConfig } from '../background'
 import axios from 'axios'
 import path from 'path'
 import fs from 'fs'
@@ -83,6 +83,14 @@ export async function insertInvoiceToDatabase(
   }
 }
 
+const config = {
+  tenantId: process.env.SHAREPOINT_TENANT_ID,
+  clientId: process.env.SHAREPOINT_CLIENT_ID,
+  clientSecret: process.env.SHAREPOINT_CLIENT_SECRET,
+  siteName: process.env.SHAREPOINT_SITE_NAME,
+  siteDomain: process.env.SHAREPOINT_SITE_DOMAIN,
+  libraryName: 'Documents'
+}
 // const config = {
 //   tenantId: process.env.SHAREPOINT_TENANT_ID,
 //   clientId: process.env.SHAREPOINT_CLIENT_ID,
@@ -95,11 +103,11 @@ export async function insertInvoiceToDatabase(
 // Get Microsoft Graph access token
 async function getAccessToken() {
   try {
-    const url = `https://login.microsoftonline.com/${sharePointConfig.tenantId}/oauth2/v2.0/token`
+    const url = `https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`
     const params = new URLSearchParams({
       grant_type: 'client_credentials',
-      client_id: sharePointConfig.clientId,
-      client_secret: sharePointConfig.clientSecret,
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
       scope: 'https://graph.microsoft.com/.default'
     })
 
@@ -130,9 +138,9 @@ export async function uploadToSharePoint(localFilePath: string) {
     console.log(`File size: ${fileBuffer.length} bytes`)
 
     // Step 1: Get site ID
-    console.log(`Getting site ID for ${sharePointConfig.siteName}...`)
+    console.log(`Getting site ID for ${config.siteName}...`)
     const siteRes = await axios.get(
-      `https://graph.microsoft.com/v1.0/sites/${sharePointConfig.siteDomain}:/sites/${sharePointConfig.siteName}`,
+      `https://graph.microsoft.com/v1.0/sites/${config.siteDomain}:/sites/${config.siteName}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -150,7 +158,7 @@ export async function uploadToSharePoint(localFilePath: string) {
 
     // Step 2: Get the drive ID
     console.log(
-      `Getting drive ID for document library "${sharePointConfig.libraryName}"...`
+      `Getting drive ID for document library "${config.libraryName}"...`
     )
     const drivesRes = await axios.get(
       `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`,
@@ -171,15 +179,13 @@ export async function uploadToSharePoint(localFilePath: string) {
     }
 
     // Find the drive with the name matching libraryName
-    const drive = drivesRes.data.value.find(
-      d => d.name === sharePointConfig.libraryName
-    )
+    const drive = drivesRes.data.value.find(d => d.name === config.libraryName)
     if (!drive) {
       console.log(
         'Available drives:',
         drivesRes.data.value.map(d => d.name).join(', ')
       )
-      throw new Error(`Drive "${sharePointConfig.libraryName}" not found`)
+      throw new Error(`Drive "${config.libraryName}" not found`)
     }
 
     const driveId = drive.id
