@@ -8,7 +8,7 @@ export const BillsSchema = z.object({
     required_error: 'Invoice date is required'
   }),
   documentType: z.enum(['invoice', 'production-order']),
-  invoiceTotal: z.number().min(1, 'Invoice total is required')
+  invoiceTotal: z.number().gt(0, 'Invoice total is required')
 })
 
 export const CreditMemoSchema = z.object({

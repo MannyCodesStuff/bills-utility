@@ -17,6 +17,7 @@ import type { BillsSchemaType } from '@/schemas'
 import type { Vendor, PdfFile, DocumentType } from './types'
 import { FormError } from '../forms/form-error'
 import { useStore } from '@/hooks/use-store'
+import MoneyInput from '../ui/money-input'
 
 interface InvoiceFormProps {
   form: UseFormReturn<BillsSchemaType>
@@ -109,15 +110,11 @@ export function InvoiceForm({
             <FormItem>
               <FormLabel>Invoice Total</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Enter invoice total"
+                <MoneyInput
+                  value={field.value || 0}
+                  onChange={field.onChange}
                   disabled={!selectedPdf || isActionLoading}
-                  value={field.value?.toString() || ''}
-                  onChange={e => {
-                    const value = e.target.value
-                    field.onChange(value === '' ? 0 : parseFloat(value) || 0)
-                  }}
+                  placeholder="Enter invoice total"
                 />
               </FormControl>
               <FormMessage />

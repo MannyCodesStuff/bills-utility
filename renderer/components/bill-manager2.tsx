@@ -237,6 +237,7 @@ export function BillManager2() {
 
   // Invoice form submit handler
   const handleRenameAndUpload = async (data: BillsSchemaType) => {
+    console.log({ data })
     setErrorMessage(undefined)
     if (!selectedPdf) {
       console.log('Please select a PDF file')
