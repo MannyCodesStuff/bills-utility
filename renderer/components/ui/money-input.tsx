@@ -2,7 +2,7 @@
 
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import { Button, Group, Input, NumberField } from 'react-aria-components'
-import { forwardRef } from 'react'
+import React, { forwardRef } from 'react'
 
 interface MoneyInputProps {
   value?: number
