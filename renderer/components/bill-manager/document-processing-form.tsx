@@ -64,17 +64,18 @@ export function DocumentProcessingForm({
 }: DocumentProcessingFormProps) {
   const { errorMessage, isActionLoading } = useStore()
   return (
-    <Card className="h-full overflow-hidden">
-      <div className="border-b p-4">
+    <Card className="h-[calc(100vh-64px-24px)]">
+      <div className="h-[70px] border-b p-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Process Document</h2>
         </div>
-        <div className="mt-2 truncate text-xs text-gray-500">
+        <div className="truncate text-xs text-gray-500">
           Select document type and provide details
         </div>
       </div>
 
-      <div className={`h-[calc(100vh-13rem)] overflow-y-auto p-2 px-3`}>
+      <div
+        className={`h-[calc(100vh-64px-24px-70px)] overflow-y-auto p-2 px-3`}>
         <div className="flex h-full flex-col">
           <div className="flex-1 p-6">
             <div className="space-y-5">

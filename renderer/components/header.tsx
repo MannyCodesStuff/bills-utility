@@ -175,71 +175,69 @@ export const Header = () => {
   // }
 
   return (
-    <header className="bg-background border-b">
-      <div className="flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <Image
-            priority
-            src="/images/DeCiccoAndSons_Logo_Vertical_RGB.png"
-            alt="logo"
-            width={60}
-            height={60}
-          />
-          <h1 className="text-xl font-semibold">Bills Utility</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <Popover
-            open={open}
-            onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-64 justify-between">
-                {storeId
-                  ? frameworks.find(framework => framework.value === storeId)
-                      ?.label
-                  : 'Select store...'}
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 p-0">
-              <Command>
-                <CommandInput placeholder="Search store..." />
-                <CommandList>
-                  <CommandEmpty>No store found.</CommandEmpty>
-                  <CommandGroup>
-                    {frameworks.map(framework => (
-                      <CommandItem
-                        key={framework.value}
-                        value={framework.value}
-                        onSelect={currentValue =>
-                          handleStoreChange(currentValue as StoreId)
-                        }>
-                        {framework.label}
-                        <Check
-                          className={cn(
-                            'ml-auto',
-                            storeId === framework.value
-                              ? 'opacity-100'
-                              : 'opacity-0'
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <DatePicker
-            date={date}
-            handleDateChange={handleDateChange}
-            className="w-64"
-          />
-          {/* <Button onClick={handleTest}>Test</Button> */}
-        </div>
+    <header className="flex h-full w-full items-center justify-between border-b px-4">
+      <div className="flex items-center gap-2">
+        <Image
+          priority
+          src="/images/DeCiccoAndSons_Logo_Vertical_RGB.png"
+          alt="logo"
+          width={60}
+          height={60}
+        />
+        <h1 className="text-xl font-semibold">Bills Utility</h1>
+      </div>
+      <div className="flex items-center gap-4">
+        <Popover
+          open={open}
+          onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-64 justify-between">
+              {storeId
+                ? frameworks.find(framework => framework.value === storeId)
+                    ?.label
+                : 'Select store...'}
+              <ChevronsUpDown className="opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0">
+            <Command>
+              <CommandInput placeholder="Search store..." />
+              <CommandList>
+                <CommandEmpty>No store found.</CommandEmpty>
+                <CommandGroup>
+                  {frameworks.map(framework => (
+                    <CommandItem
+                      key={framework.value}
+                      value={framework.value}
+                      onSelect={currentValue =>
+                        handleStoreChange(currentValue as StoreId)
+                      }>
+                      {framework.label}
+                      <Check
+                        className={cn(
+                          'ml-auto',
+                          storeId === framework.value
+                            ? 'opacity-100'
+                            : 'opacity-0'
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        <DatePicker
+          date={date}
+          handleDateChange={handleDateChange}
+          className="w-64"
+        />
+        {/* <Button onClick={handleTest}>Test</Button> */}
       </div>
     </header>
   )

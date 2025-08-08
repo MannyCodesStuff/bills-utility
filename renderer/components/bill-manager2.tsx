@@ -711,49 +711,47 @@ export function BillManager2() {
   }
 
   return (
-    <div className="mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* PDF File List Sidebar */}
-        <div className={`col-span-3 transition-all duration-300`}>
-          <PdfFileList
-            loading={loading}
-            filterQuery={filterQuery}
-            setFilterQuery={setFilterQuery}
-            onRefresh={handleRefresh}
-            onDelete={handleDeletePdf}
+    <div className="grid h-[calc(100vh-64px)] w-screen grid-cols-1 gap-6 p-3 lg:grid-cols-12">
+      {/* PDF File List Sidebar */}
+      <div className="col-span-3 h-[calc(100vh-64px-24px)] transition-all duration-300">
+        <PdfFileList
+          loading={loading}
+          filterQuery={filterQuery}
+          setFilterQuery={setFilterQuery}
+          onRefresh={handleRefresh}
+          onDelete={handleDeletePdf}
+        />
+      </div>
+
+      {/* PDF Viewer */}
+      <div
+        className={`lg:col-span-11 ${activeTab === 'scans' ? 'lg:col-span-6' : 'lg:col-span-9'} h-[calc(100vh-64px-24px)] transition-all duration-300`}>
+        <PdfViewer />
+      </div>
+
+      {/* Document Processing Form - only shown for Scans tab */}
+      {activeTab === 'scans' && (
+        <div className="h-[calc(100vh-64px-24px)] transition-all duration-300 lg:col-span-3">
+          <DocumentProcessingForm
+            key={`${documentType}-${selectedPdf?.originalPath || 'no-pdf'}`}
+            documentType={documentType}
+            setDocumentType={setDocumentType}
+            invoiceForm={invoiceForm}
+            creditMemoForm={creditMemoForm}
+            interStoreTransferForm={interStoreTransferForm}
+            nonInvoiceForm={nonInvoiceForm}
+            otherForm={otherForm}
+            vendors={vendors}
+            vendorsLoading={vendorsLoading}
+            selectedPdf={selectedPdf || undefined}
+            onInvoiceSubmit={handleRenameAndUpload}
+            onCreditMemoSubmit={handleUploadCreditMemo}
+            onInterStoreTransferSubmit={handleUploadInterStoreTransfer}
+            onNonInvoiceSubmit={handleUploadNonInvoice}
+            onOtherSubmit={handleUploadOther}
           />
         </div>
-
-        {/* PDF Viewer */}
-        <div
-          className={`lg:col-span-11 ${activeTab === 'scans' ? 'lg:col-span-6' : 'lg:col-span-9'} transition-all duration-300`}>
-          <PdfViewer />
-        </div>
-
-        {/* Document Processing Form - only shown for Scans tab */}
-        {activeTab === 'scans' && (
-          <div className="transition-all duration-300 lg:col-span-3">
-            <DocumentProcessingForm
-              key={`${documentType}-${selectedPdf?.originalPath || 'no-pdf'}`}
-              documentType={documentType}
-              setDocumentType={setDocumentType}
-              invoiceForm={invoiceForm}
-              creditMemoForm={creditMemoForm}
-              interStoreTransferForm={interStoreTransferForm}
-              nonInvoiceForm={nonInvoiceForm}
-              otherForm={otherForm}
-              vendors={vendors}
-              vendorsLoading={vendorsLoading}
-              selectedPdf={selectedPdf || undefined}
-              onInvoiceSubmit={handleRenameAndUpload}
-              onCreditMemoSubmit={handleUploadCreditMemo}
-              onInterStoreTransferSubmit={handleUploadInterStoreTransfer}
-              onNonInvoiceSubmit={handleUploadNonInvoice}
-              onOtherSubmit={handleUploadOther}
-            />
-          </div>
-        )}
-      </div>
+      )}
     </div>
   )
 }

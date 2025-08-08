@@ -14,67 +14,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import type { PdfFile, TabType } from './types'
 import { loadPdfForDisplay } from '@/lib/utils'
 import { useState, useEffect } from 'react'
-
-/**
- * PDF File List Component with Blob URL Support
- *
- * This component now includes functionality to:
- * 1. Load PDF files and create blob URLs for display
- * 2. Handle loading states and error handling
- * 3. Automatically clean up blob URLs to prevent memory leaks
- *
- * How to access the PDF blob URL:
- *
- * Option 1: Via console logs (for debugging)
- * - Check browser console when clicking a PDF file
- * - Look for "PDF blob URL ready: blob:..." messages
- *
- * Option 2: Via the getCurrentPdfState() function
- * - This function returns the current PDF display state
- * - Can be exposed to parent components via callbacks
- *
- * Option 3: Access via parent component callback
- * - Add onPdfLoaded prop to this component
- * - Call it when PDF is loaded with the blob URL
- *
- * Example usage in parent component:
- *
- * <PdfFileList
- *   onPdfLoaded={(pdfState) => {
- *     if (pdfState.url) {
- *       // Use the blob URL to display PDF
- *       // In an iframe: <iframe src={pdfState.url} />
- *       // In an object: <object data={pdfState.url} type="application/pdf" />
- *       // With PDF.js or other PDF viewers
- *     }
- *   }}
- *   // ... other props
- * />
- *
- * The blob URL lifecycle:
- * - Created when user clicks a PDF file
- * - Automatically cleaned up when selecting a different PDF
- * - Cleaned up when component unmounts
- * - Can be manually cleared with clearPdf()
- */
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuTrigger
-// } from '../ui/dropdown-menu'
 import { SelectDirectory } from './select-directory'
 import { useStore } from '@/hooks/use-store'
-// import { deleteFile } from '@/actions/documentManager'
 
 interface PdfFileListProps {
-  // pdfFiles: PdfFile[]
   loading: boolean
   filterQuery: string
   setFilterQuery: (query: string) => void
   onRefresh: (type: TabType) => void
   onDelete: (filePath: string) => Promise<void>
-  // Optional callback for when PDF is loaded with blob URL
   onPdfLoaded?: (pdfState: {
     isLoading: boolean
     url: string | null
@@ -82,10 +30,7 @@ interface PdfFileListProps {
     error: string | null
     hasActivePdf: boolean
   }) => void
-  // pdfFiles2: PdfFile[]
 }
-
-// PDF display state interface
 interface PdfDisplayState {
   url: string | null
   fileName: string | null
@@ -384,15 +329,15 @@ export function PdfFileList({
   )
 
   return (
-    <Card className="h-full overflow-hidden">
+    <Card className="flex h-[calc(100vh-64px-24px)] max-h-full flex-col">
       <Tabs
         defaultValue="scans"
-        className="flex w-full flex-col items-center justify-center"
+        className="flex h-full flex-col"
         onValueChange={value => {
           setPdfFiles([])
           setActiveTab(value as TabType)
         }}>
-        <TabsList className="mt-2 w-[95%]">
+        <TabsList className="mx-auto mt-2 w-[95%]">
           <TabsTrigger
             value="scans"
             className="w-full">
@@ -411,44 +356,56 @@ export function PdfFileList({
         </TabsList>
 
         {/* Scans Tab Content */}
-        <TabsContent
-          value="scans"
-          className="w-full">
-          {renderTabHeader('Scans', directoryPaths.scans, 'scans')}
-          {renderFileList(
-            filteredPdfFiles,
-            'No scans found in this directory',
-            directoryPaths.scans
-          )}
-        </TabsContent>
+        {activeTab === 'scans' && (
+          <TabsContent
+            value="scans"
+            className="flex flex-1 flex-col overflow-hidden">
+            {renderTabHeader('Scans', directoryPaths.scans, 'scans')}
+            <div className="flex-1 overflow-y-auto">
+              {renderFileList(
+                filteredPdfFiles,
+                'No scans found in this directory',
+                directoryPaths.scans
+              )}
+            </div>
+          </TabsContent>
+        )}
 
         {/* Bills Tab Content */}
-        <TabsContent
-          value="bills"
-          className="w-full">
-          {renderTabHeader('Bills', directoryPaths.bills, 'bills')}
-          {renderFileList(
-            filteredPdfFiles,
-            'No bills found in this directory',
-            directoryPaths.bills
-          )}
-        </TabsContent>
+        {activeTab === 'bills' && (
+          <TabsContent
+            value="bills"
+            className="flex flex-1 flex-col overflow-hidden">
+            {renderTabHeader('Bills', directoryPaths.bills, 'bills')}
+            <div className="flex-1 overflow-y-auto">
+              {renderFileList(
+                filteredPdfFiles,
+                'No bills found in this directory',
+                directoryPaths.bills
+              )}
+            </div>
+          </TabsContent>
+        )}
 
         {/* Non-Invoice Tab Content */}
-        <TabsContent
-          value="non-invoice"
-          className="w-full">
-          {renderTabHeader(
-            'Non-Invoice Documents',
-            directoryPaths['non-invoice'],
-            'non-invoice'
-          )}
-          {renderFileList(
-            filteredPdfFiles,
-            'No non-invoice documents found in this directory',
-            directoryPaths['non-invoice']
-          )}
-        </TabsContent>
+        {activeTab === 'non-invoice' && (
+          <TabsContent
+            value="non-invoice"
+            className="flex flex-1 flex-col overflow-hidden">
+            {renderTabHeader(
+              'Non-Invoice Documents',
+              directoryPaths['non-invoice'],
+              'non-invoice'
+            )}
+            <div className="flex-1 overflow-y-auto">
+              {renderFileList(
+                filteredPdfFiles,
+                'No non-invoice documents found in this directory',
+                directoryPaths['non-invoice']
+              )}
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </Card>
   )
