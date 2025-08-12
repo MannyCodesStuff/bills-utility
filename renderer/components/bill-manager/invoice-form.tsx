@@ -67,14 +67,10 @@ export function InvoiceForm({
   })
 
   const handleVendorChange = async (vendorId: string) => {
-    if (typeof window !== 'undefined' && (window as any).ipc) {
+    if (typeof window !== 'undefined' && window.ipc) {
       if (storeId && date) {
         const vendor = vendorId === 'CONSOLID_SUPER' ? 'K001' : vendorId
-        const response = await (window as any).ipc.getASNs(
-          storeId,
-          vendor,
-          date
-        )
+        const response = await window.ipc.getASNs(storeId, vendor, date)
         if (response?.success) {
           setAsn(response.data || [])
         } else {
