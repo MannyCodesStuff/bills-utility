@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { RefreshCw, Upload } from 'lucide-react'
 import {
@@ -9,15 +9,15 @@ import {
   FormLabel,
   FormMessage
 } from '../ui/form'
-import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { DatePicker } from '../ui/date-picker'
 import { VendorCombobox } from '../ui/vendor-combobox'
 import type { BillsSchemaType } from '@/schemas'
-import type { Vendor, PdfFile, DocumentType } from './types'
+import type { Vendor, PdfFile, DocumentType, Asn } from './types'
 import { FormError } from '../forms/form-error'
 import { useStore } from '@/hooks/use-store'
 import MoneyInput from '../ui/money-input'
+import { InvoiceNumberCombobox } from '../ui/invoice-number-combobox'
 
 interface InvoiceFormProps {
   form: UseFormReturn<BillsSchemaType>
@@ -29,6 +29,18 @@ interface InvoiceFormProps {
   errorMessage: string
 }
 
+// Parse "$1,234.56" / "1,234.56" / "(123.45)" / "-123.45" -> number
+function parseCurrencyToNumber(input: unknown): number {
+  if (input == null) return 0
+  let s = String(input).trim()
+  const negativeByParens = /^\(.*\)$/.test(s)
+  s = s.replace(/[^\d.-]/g, '') // keep digits, dot, minus
+  let n = parseFloat(s || '0')
+  if (!Number.isFinite(n)) n = 0
+  if (negativeByParens && n > 0) n = -n
+  return n
+}
+
 export function InvoiceForm({
   form,
   vendors,
@@ -38,16 +50,57 @@ export function InvoiceForm({
   documentType,
   errorMessage
 }: InvoiceFormProps) {
-  const { isActionLoading } = useStore()
+  const { isActionLoading, date, storeId } = useStore()
+  const [asn, setAsn] = useState<Asn[]>([])
+
   const vendorsToShow =
     documentType === 'production-order'
       ? vendors.filter(vendor => vendor.id === '4181' || vendor.id === '4183')
       : vendors
+
+  // modify name of a specific vendor
+  const modifiedVendors = vendorsToShow.map(vendor => {
+    if (vendor.id === 'CONSOLID_SUPER') {
+      return { ...vendor, name: 'CSS - KoolTemp' }
+    }
+    return vendor
+  })
+
+  const handleVendorChange = async (vendorId: string) => {
+    if (typeof window !== 'undefined' && (window as any).ipc) {
+      if (storeId && date) {
+        const vendor = vendorId === 'CONSOLID_SUPER' ? 'K001' : vendorId
+        const response = await (window as any).ipc.getASNs(
+          storeId,
+          vendor,
+          date
+        )
+        if (response?.success) {
+          setAsn(response.data || [])
+        } else {
+          setAsn([])
+        }
+      }
+    }
+  }
+
+  // Collect invoice numbers from ASNs (F91)
+  const invoiceNumbersFromAsn = React.useMemo(() => {
+    const nums =
+      (asn ?? [])
+        .map(a => a?.F91 ?? '')
+        .filter(Boolean)
+        .map(String) || []
+
+    return Array.from(new Set(nums)).sort()
+  }, [asn])
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4">
+        {/* Vendor */}
         <FormField
           control={form.control}
           name="vendorId"
@@ -56,9 +109,12 @@ export function InvoiceForm({
               <FormLabel>Vendor</FormLabel>
               <FormControl>
                 <VendorCombobox
-                  vendors={vendorsToShow}
+                  vendors={modifiedVendors}
                   selectedVendor={field.value}
-                  setSelectedVendor={field.onChange}
+                  setSelectedVendor={vendorId => {
+                    field.onChange(vendorId)
+                    handleVendorChange(vendorId)
+                  }}
                   disabled={!selectedPdf || vendorsLoading || isActionLoading}
                 />
               </FormControl>
@@ -67,6 +123,7 @@ export function InvoiceForm({
           )}
         />
 
+        {/* Invoice Number -> sets invoiceTotal from matching ASN.Net */}
         <FormField
           control={form.control}
           name="invoiceNumber"
@@ -74,10 +131,26 @@ export function InvoiceForm({
             <FormItem>
               <FormLabel>Invoice Number</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Enter invoice number"
+                <InvoiceNumberCombobox
+                  value={field.value || ''}
+                  onChange={(val: string) => {
+                    // update invoice number
+                    field.onChange(val)
+                    // find matching ASN and set invoiceTotal from Net
+                    const match = asn.find(a => String(a?.F91) === String(val))
+                    if (match?.Net != null) {
+                      const total = parseCurrencyToNumber(match.Net)
+                      form.setValue('invoiceTotal', total, {
+                        shouldDirty: true,
+                        shouldValidate: true
+                      })
+                    }
+                  }}
+                  options={invoiceNumbersFromAsn}
                   disabled={!selectedPdf || isActionLoading}
+                  placeholder="Select or type invoice number..."
+                  searchPlaceholder="Search or type..."
+                  groupLabel="Electronic Invoice Numbers"
                 />
               </FormControl>
               <FormMessage />
@@ -85,6 +158,7 @@ export function InvoiceForm({
           )}
         />
 
+        {/* Invoice Date */}
         <FormField
           control={form.control}
           name="invoiceDate"
@@ -103,6 +177,7 @@ export function InvoiceForm({
           )}
         />
 
+        {/* Invoice Total (can still be edited manually) */}
         <FormField
           control={form.control}
           name="invoiceTotal"

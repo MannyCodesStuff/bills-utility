@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { addDays } from 'date-fns'
-import { Folder } from 'lucide-react'
+import { File, Folder } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useStore } from '@/hooks/use-store'
@@ -36,6 +36,15 @@ import {
   renameFile,
   uploadFileToSharePoint
 } from '@/actions/documentManager'
+import { Button } from './ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from './ui/sheet'
 
 export function BillManager2() {
   const [loading, setLoading] = useState(true)
@@ -694,7 +703,7 @@ export function BillManager2() {
 
   if (!storeId) {
     return (
-      <div className="container flex h-full items-center justify-center py-20">
+      <div className="container flex h-full w-screen items-center justify-center py-20">
         <div className="rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
           <div className="text-center">
             <div className="text-primary mb-4">
@@ -711,9 +720,17 @@ export function BillManager2() {
   }
 
   return (
-    <div className="grid h-[calc(100vh-64px)] w-screen grid-cols-1 gap-6 p-3 lg:grid-cols-12">
-      {/* PDF File List Sidebar */}
-      <div className="col-span-3 h-[calc(100vh-64px-24px)] transition-all duration-300">
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button className="ml-3 mt-3 flex items-center gap-2 capitalize lg:hidden">
+          <File className="size-4" /> {activeTab} Folder
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left">
+        <SheetHeader className="sr-only">
+          <SheetTitle>PDF Files List Sidebar</SheetTitle>
+          <SheetDescription>Select a folder to view the files</SheetDescription>
+        </SheetHeader>
         <PdfFileList
           loading={loading}
           filterQuery={filterQuery}
@@ -721,37 +738,49 @@ export function BillManager2() {
           onRefresh={handleRefresh}
           onDelete={handleDeletePdf}
         />
-      </div>
-
-      {/* PDF Viewer */}
-      <div
-        className={`lg:col-span-11 ${activeTab === 'scans' ? 'lg:col-span-6' : 'lg:col-span-9'} h-[calc(100vh-64px-24px)] transition-all duration-300`}>
-        <PdfViewer />
-      </div>
-
-      {/* Document Processing Form - only shown for Scans tab */}
-      {activeTab === 'scans' && (
-        <div className="h-[calc(100vh-64px-24px)] transition-all duration-300 lg:col-span-3">
-          <DocumentProcessingForm
-            key={`${documentType}-${selectedPdf?.originalPath || 'no-pdf'}`}
-            documentType={documentType}
-            setDocumentType={setDocumentType}
-            invoiceForm={invoiceForm}
-            creditMemoForm={creditMemoForm}
-            interStoreTransferForm={interStoreTransferForm}
-            nonInvoiceForm={nonInvoiceForm}
-            otherForm={otherForm}
-            vendors={vendors}
-            vendorsLoading={vendorsLoading}
-            selectedPdf={selectedPdf || undefined}
-            onInvoiceSubmit={handleRenameAndUpload}
-            onCreditMemoSubmit={handleUploadCreditMemo}
-            onInterStoreTransferSubmit={handleUploadInterStoreTransfer}
-            onNonInvoiceSubmit={handleUploadNonInvoice}
-            onOtherSubmit={handleUploadOther}
+      </SheetContent>
+      <div className="grid h-[calc(100vh-64px-52px)] w-screen grid-cols-12 gap-3 p-3 lg:h-[calc(100vh-64px)]">
+        {/* PDF File List Sidebar */}
+        <div className="col-span-3 h-[calc(100vh-64px-52px-24px)] transition-all duration-300 max-lg:hidden lg:h-[calc(100vh-64px-24px)]">
+          <PdfFileList
+            loading={loading}
+            filterQuery={filterQuery}
+            setFilterQuery={setFilterQuery}
+            onRefresh={handleRefresh}
+            onDelete={handleDeletePdf}
           />
         </div>
-      )}
-    </div>
+
+        {/* PDF Viewer */}
+        <div
+          className={`lg:col-span-11 ${activeTab === 'scans' ? 'col-span-8 lg:col-span-6' : 'col-span-12 lg:col-span-9'} h-[calc(100vh-64px-52px-24px)] transition-all duration-300 lg:h-[calc(100vh-64px-24px)]`}>
+          <PdfViewer />
+        </div>
+
+        {/* Document Processing Form - only shown for Scans tab */}
+        {activeTab === 'scans' && (
+          <div className="col-span-4 h-[calc(100vh-64px-52px-24px)] transition-all duration-300 lg:col-span-3 lg:h-[calc(100vh-64px-24px)]">
+            <DocumentProcessingForm
+              key={`${documentType}-${selectedPdf?.originalPath || 'no-pdf'}`}
+              documentType={documentType}
+              setDocumentType={setDocumentType}
+              invoiceForm={invoiceForm}
+              creditMemoForm={creditMemoForm}
+              interStoreTransferForm={interStoreTransferForm}
+              nonInvoiceForm={nonInvoiceForm}
+              otherForm={otherForm}
+              vendors={vendors}
+              vendorsLoading={vendorsLoading}
+              selectedPdf={selectedPdf || undefined}
+              onInvoiceSubmit={handleRenameAndUpload}
+              onCreditMemoSubmit={handleUploadCreditMemo}
+              onInterStoreTransferSubmit={handleUploadInterStoreTransfer}
+              onNonInvoiceSubmit={handleUploadNonInvoice}
+              onOtherSubmit={handleUploadOther}
+            />
+          </div>
+        )}
+      </div>
+    </Sheet>
   )
 }

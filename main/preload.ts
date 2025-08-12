@@ -33,6 +33,9 @@ const handler = {
   async getVendors() {
     return ipcRenderer.invoke('get-vendors')
   },
+  async getASNs(storeId: string, vendorId: string, date: Date) {
+    return ipcRenderer.invoke('get-asn-by-vendor', storeId, vendorId, date)
+  },
   async getPdfFiles(directoryPath: string) {
     return ipcRenderer.invoke('get-pdf-files', directoryPath)
   },

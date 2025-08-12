@@ -83,6 +83,27 @@ export async function insertInvoiceToDatabase(
   }
 }
 
+export async function getASNsByVendorId(
+  storeId: string,
+  vendorId: string,
+  date: Date
+) {
+  try {
+    const pool = await mssql.connect(dbConfig)
+    const result = await pool
+      .request()
+      .input('store_id', mssql.VarChar(4), storeId)
+      .input('vendor_id', mssql.VarChar(14), vendorId)
+      .input('date', mssql.Date, date)
+      .query(
+        'select * from LOCDATAMART.dbo.RECV_SUMMARY where F1056=@store_id AND F254=@date AND F27=@vendor_id'
+      )
+    return result.recordset
+  } catch (error) {
+    console.error('Error getting ASNs by vendor id:', error)
+  }
+}
+
 const config = {
   tenantId: process.env.SHAREPOINT_TENANT_ID,
   clientId: process.env.SHAREPOINT_CLIENT_ID,

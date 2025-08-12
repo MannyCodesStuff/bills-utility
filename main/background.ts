@@ -23,6 +23,7 @@ import {
 } from './helpers/directories'
 import {
   findInvoiceInDatabase,
+  getASNsByVendorId,
   insertInvoiceToDatabase,
   uploadToSharePoint
 } from './helpers/util'
@@ -1200,6 +1201,18 @@ function setupAutoUpdaterEvents() {
     fs.unlinkSync(filePath)
     return { success: true }
   })
+
+  ipcMain.handle(
+    'get-asn-by-vendor',
+    async (_, storeId: string, vendorId: string, date: Date) => {
+      try {
+        const result = await getASNsByVendorId(storeId, vendorId, date)
+        return { success: true, data: result }
+      } catch (error) {
+        return { success: false, message: error.message }
+      }
+    }
+  )
 
   // handle moving a file to z drive
   ipcMain.handle(

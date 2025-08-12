@@ -64,7 +64,7 @@ export function DocumentProcessingForm({
 }: DocumentProcessingFormProps) {
   const { errorMessage, isActionLoading } = useStore()
   return (
-    <Card className="h-[calc(100vh-64px-24px)]">
+    <Card className="h-[calc(100vh-64px-52px-24px)] lg:h-[calc(100vh-64px-24px)]">
       <div className="h-[70px] border-b p-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Process Document</h2>
@@ -75,7 +75,7 @@ export function DocumentProcessingForm({
       </div>
 
       <div
-        className={`h-[calc(100vh-64px-24px-70px)] overflow-y-auto p-2 px-3`}>
+        className={`h-[calc(100vh-64px-52px-24px-70px)] overflow-y-auto p-2 px-3 lg:h-[calc(100vh-64px-24px-70px)]`}>
         <div className="flex h-full flex-col">
           <div className="flex-1 p-6">
             <div className="space-y-5">
@@ -87,7 +87,7 @@ export function DocumentProcessingForm({
                   onValueChange={value =>
                     setDocumentType(value as DocumentType)
                   }>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full max-lg:text-xs max-lg:placeholder:text-xs">
                     <SelectValue placeholder="Select document type" />
                   </SelectTrigger>
                   <SelectContent>

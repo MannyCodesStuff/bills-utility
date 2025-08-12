@@ -8,6 +8,17 @@ export type Vendor = {
   name: string
 }
 
+export type Asn = {
+  F1056: string
+  F91: string
+  F27: string
+  F254: Date
+  F03: number
+  F238: string
+  Gross: string
+  Net: string
+}
+
 export type DocumentType =
   | 'invoice'
   | 'deposit-slip'

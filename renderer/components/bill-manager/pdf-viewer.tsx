@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { FileText, Loader2, AlertCircle } from 'lucide-react'
+import {
+  FileText,
+  Loader2,
+  AlertCircle,
+  ArrowRight,
+  ArrowLeft
+} from 'lucide-react'
 import { Card } from '../ui/card'
 import { useStore } from '@/hooks/use-store'
 import { loadPdfForDisplay } from '@/lib/utils'
+import { Button } from '../ui/button'
 
 interface PdfDisplayState {
   url: string | null
@@ -13,7 +20,7 @@ interface PdfDisplayState {
 }
 
 export function PdfViewer() {
-  const { selectedPdf, isActionLoading } = useStore()
+  const { selectedPdf, isActionLoading, pdfFiles, setSelectedPdf } = useStore()
   const [pdfDisplay, setPdfDisplay] = useState<PdfDisplayState>({
     url: null,
     fileName: null,
@@ -113,8 +120,8 @@ export function PdfViewer() {
 
   if (!selectedPdf) {
     return (
-      <Card className="h-full overflow-hidden">
-        <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center p-6">
+      <Card className="flex h-[calc(100vh-64px-52px-24px)] flex-col lg:h-[calc(100vh-64px-24px)]">
+        <div className="flex h-[calc(100vh-12rem-52px)] flex-col items-center justify-center p-6 lg:h-[calc(100vh-12rem)]">
           <FileText className="text-muted-foreground/40 size-16" />
           <h3 className="mt-4 text-lg font-medium">No Document Selected</h3>
           <p className="text-muted-foreground mt-2 text-center text-sm">
@@ -125,44 +132,68 @@ export function PdfViewer() {
     )
   }
 
+  const currentPdfIndex = pdfFiles.findIndex(
+    pdf => pdf.originalPath === selectedPdf.originalPath
+  )
+
+  const handlePreviousPdf = () => {
+    const previousIndex = currentPdfIndex - 1
+    if (previousIndex >= 0) {
+      setSelectedPdf(pdfFiles[previousIndex])
+    }
+  }
+
+  const handleNextPdf = () => {
+    const nextIndex = currentPdfIndex + 1
+    if (nextIndex < pdfFiles.length) {
+      setSelectedPdf(pdfFiles[nextIndex])
+    }
+  }
+
   return (
-    <Card className="flex h-[calc(100vh-64px-24px)] flex-col">
+    <Card className="flex h-[calc(100vh-64px-52px-24px)] flex-col lg:h-[calc(100vh-64px-24px)]">
       <div className="flex h-[70px] items-center justify-between border-b p-3">
         <div className="overflow-hidden">
-          <h2 className="truncate text-lg font-semibold">
+          <h2 className="truncate font-semibold">
             {pdfDisplay.fileName || selectedPdf.originalPath.split('\\').pop()}
           </h2>
           <p className="text-muted-foreground truncate text-xs">
             {selectedPdf.originalPath}
           </p>
         </div>
-
-        {/* Loading/Processing indicator in header */}
-        {isActionLoading ? (
-          <div className="text-muted-foreground flex items-center gap-2 text-sm">
-            <Loader2 className="size-4 animate-spin" />
-            Processing...
-          </div>
-        ) : (
-          pdfDisplay.isLoading && (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <Loader2 className="size-4 animate-spin" />
-              Loading PDF...
-            </div>
-          )
-        )}
+        <div className="flex flex-nowrap items-center gap-3">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handlePreviousPdf}
+            disabled={currentPdfIndex === 0}
+            className="size-8">
+            <ArrowLeft className="size-4" />
+          </Button>
+          <span className="text-muted-foreground whitespace-nowrap text-sm">
+            {currentPdfIndex + 1} / {pdfFiles.length}
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleNextPdf}
+            disabled={currentPdfIndex === pdfFiles.length - 1}
+            className="size-8">
+            <ArrowRight className="size-4" />
+          </Button>
+        </div>
       </div>
 
-      <div className="h-[calc(100vh-64px-24px-70px)]">
+      <div className="h-[calc(100vh-64px-52px-24px-70px)] lg:h-[calc(100vh-64px-24px-70px)]">
         {pdfDisplay.isLoading ? (
           // Loading state
-          <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center p-6">
+          <div className="flex h-[calc(100vh-12rem-52px)] flex-col items-center justify-center p-6 lg:h-[calc(100vh-12rem)]">
             <Loader2 className="text-primary size-8 animate-spin" />
             <p className="text-muted-foreground mt-4 text-sm">Loading PDF...</p>
           </div>
         ) : pdfDisplay.error && !isActionLoading ? (
           // Error state
-          <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center p-6">
+          <div className="flex h-[calc(100vh-12rem-52px)] flex-col items-center justify-center p-6 lg:h-[calc(100vh-12rem)]">
             <AlertCircle className="size-16 text-red-500/40" />
             <h3 className="mt-4 text-lg font-medium text-red-600">
               Failed to Load PDF
@@ -205,7 +236,7 @@ export function PdfViewer() {
           </div>
         ) : (
           // Fallback state
-          <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center p-6">
+          <div className="flex h-[calc(100vh-12rem-52px)] flex-col items-center justify-center p-6 lg:h-[calc(100vh-12rem)]">
             <FileText className="text-muted-foreground/40 size-16" />
             <h3 className="mt-4 text-lg font-medium">No PDF Content</h3>
             <p className="text-muted-foreground mt-2 text-center text-sm">

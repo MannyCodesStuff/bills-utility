@@ -332,6 +332,7 @@ export function PdfFileList({
     <Card className="flex h-[calc(100vh-64px-24px)] max-h-full flex-col">
       <Tabs
         defaultValue="scans"
+        value={activeTab}
         className="flex h-full flex-col"
         onValueChange={value => {
           setPdfFiles([])

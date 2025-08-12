@@ -55,7 +55,7 @@ export function VendorCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between truncate"
+          className="w-full justify-between truncate max-lg:text-xs max-lg:placeholder:text-xs"
           disabled={disabled}>
           {selectedVendor ? selectedVendorName : selectText}
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />

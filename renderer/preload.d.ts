@@ -10,6 +10,30 @@ export interface IpcHandler {
   setDefaultDirectory: (directory: string) => Promise<boolean>
   getServerPort: () => Promise<number>
   getVendors: () => Promise<Array<{ id: string; name: string }>>
+  getASNs: (
+    storeId: string,
+    vendorId: string,
+    date: Date
+  ) => Promise<
+    | {
+        success: boolean
+        data?: Array<{
+          F1056: string
+          F91: string
+          F27: string
+          F254: Date
+          F03: number
+          F238: string
+          Gross: string
+          Net: string
+        }>
+      }
+    | {
+        success: false
+        error: string
+      }
+  >
+
   getPdfFiles: (directoryPath: string) => Promise<{
     success: boolean
     files?: Array<{
