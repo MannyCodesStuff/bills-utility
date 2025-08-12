@@ -703,7 +703,7 @@ export function BillManager2() {
 
   if (!storeId) {
     return (
-      <div className="container flex h-full w-screen items-center justify-center py-20">
+      <div className="flex h-full w-screen items-center justify-center py-20">
         <div className="rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
           <div className="text-center">
             <div className="text-primary mb-4">
