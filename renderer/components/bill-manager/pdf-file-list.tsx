@@ -131,6 +131,7 @@ export function PdfFileList({
   // onDelete
 }: PdfFileListProps) {
   const {
+    date,
     activeTab,
     setActiveTab,
     directoryExists,
@@ -300,7 +301,7 @@ export function PdfFileList({
   ) => (
     <div className="border-b p-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="text font-semibold">{title}</h2>
         <div className="flex gap-2">
           <Button
             variant="ghost"
@@ -377,7 +378,11 @@ export function PdfFileList({
           <TabsContent
             value="bills"
             className="flex flex-1 flex-col overflow-hidden">
-            {renderTabHeader('Bills', directoryPaths.bills, 'bills')}
+            {renderTabHeader(
+              `${date?.toLocaleDateString() ?? ''} Bills`,
+              directoryPaths.bills,
+              'bills'
+            )}
             <div className="flex-1 overflow-y-auto">
               {renderFileList(
                 filteredPdfFiles,
@@ -394,7 +399,7 @@ export function PdfFileList({
             value="non-invoice"
             className="flex flex-1 flex-col overflow-hidden">
             {renderTabHeader(
-              'Non-Invoice Documents',
+              `${date?.toLocaleDateString() ?? ''} Non-Invoice Documents`,
               directoryPaths['non-invoice'],
               'non-invoice'
             )}

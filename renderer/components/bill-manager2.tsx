@@ -54,6 +54,7 @@ export function BillManager2() {
   const [documentType, setDocumentType] = useState<DocumentType | null>(null)
   const {
     storeId,
+    date,
     activeTab,
     selectedPdf,
     setSelectedPdf,
@@ -723,7 +724,9 @@ export function BillManager2() {
     <Sheet>
       <SheetTrigger asChild>
         <Button className="ml-3 mt-3 flex items-center gap-2 capitalize lg:hidden">
-          <File className="size-4" /> {activeTab} Folder
+          <File className="size-4" />{' '}
+          {activeTab !== 'scans' && date && `${date.toLocaleDateString()} `}
+          {activeTab} Folder
         </Button>
       </SheetTrigger>
       <SheetContent side="left">
