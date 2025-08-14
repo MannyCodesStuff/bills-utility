@@ -37,10 +37,13 @@ const defaultScansPathTemplates = [
 const defaultBillsPathTemplates = [
   '\\\\10.1.10.20\\Files\\{storeInfo}\\{storeName} Bills\\{year}\\{month} - {monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\{storeName} Bills\\{year}\\{month}- {monthName}\\{day}',
+  '\\\\10.1.10.20\\Files\\{storeInfo}\\{storeName} Bills\\{year}\\{month}-{monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\Bills\\{year}\\{month} - {monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\Bills\\{year}\\{month}- {monthName}\\{day}',
+  '\\\\10.1.10.20\\Files\\{storeInfo}\\Bills\\{year}\\{month}-{monthName}\\{day}',
   'Z:\\{storeInfo}\\{storeName} Bills\\{year}\\{month} - {monthName}\\{day}',
   'Z:\\{storeInfo}\\{storeName} Bills\\{year}\\{month}- {monthName}\\{day}',
+  'Z:\\{storeInfo}\\{storeName} Bills\\{year}\\{month}-{monthName}\\{day}',
   'Z:\\{storeInfo}\\Bills\\{year}\\{month} - {monthName}\\{day}',
   'Z:\\{storeInfo}\\Bills\\{year}\\{month}- {monthName}\\{day}'
 ]
@@ -50,6 +53,7 @@ const defaultNonInvoicePathTemplates = [
   '\\\\10.1.10.20\\Files\\{storeInfo}\\{storeName} Bills\\Non Invoice Docs\\{year}\\{month}- {monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\Bills\\Non Invoice Docs\\{year}\\{month} - {monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\Bills\\Non Invoice Docs\\{year}\\{month}- {monthName}\\{day}',
+  '\\\\10.1.10.20\\Files\\{storeInfo}\\Bills\\Non Invoice Docs\\{year}\\{month}-{monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\{storeName} Bills\\Non Invoice Docs\\{year}\\{month}-{monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\Non Invoice\\{month}-{monthName}\\{day}',
   '\\\\10.1.10.20\\Files\\{storeInfo}\\Non Invoice\\{month} - {monthName}\\{day}',

@@ -126,9 +126,13 @@ function getExistingDirectory(storeId: StoreId, type: TabType, date: Date) {
   } else if (type === 'non-invoice') {
     candidates = getNonInvoiceDirectorCandidates(storeId, date)
   }
+  if (type === 'non-invoice') {
+    console.log(candidates)
+  }
 
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
+      console.log('existing directory found', candidate)
       return candidate
     }
   }
