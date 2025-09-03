@@ -127,21 +127,32 @@ export function getScansDirectorCandidates(storeId: StoreId) {
 
 export function getBillsDirectorCandidates(storeId: StoreId, date: Date) {
   const year = date.getFullYear()
-  // if month is signle digit, add a 0 in front of it
   const month = date.getMonth() + 1
   const day = date.getDate()
   const monthName = date.toLocaleString('default', { month: 'long' })
-  // store id without the first character in the id
   const storeInfo = `${storeId.slice(1)} ${storeNameMap[storeId]}`
-  return defaultBillsPathTemplates.map(template =>
-    template
-      .replace('{storeInfo}', storeInfo)
-      .replace('{storeName}', storeNameMap[storeId])
-      .replace('{year}', year.toString())
-      .replace('{month}', month.toString().padStart(2, '0'))
-      .replace('{monthName}', monthName)
-      .replace('{day}', day.toString())
-  )
+
+  const dayVariants = [day.toString(), day.toString().padStart(2, '0')]
+  const monthVariants = [month.toString(), month.toString().padStart(2, '0')]
+
+  const candidates: string[] = []
+  for (const template of defaultBillsPathTemplates) {
+    for (const d of dayVariants) {
+      for (const m of monthVariants) {
+        candidates.push(
+          template
+            .replace('{storeInfo}', storeInfo)
+            .replace('{storeName}', storeNameMap[storeId])
+            .replace('{year}', year.toString())
+            .replace('{month}', m)
+            .replace('{monthName}', monthName)
+            .replace('{day}', d)
+        )
+      }
+    }
+  }
+
+  return candidates
 }
 
 export function getNonInvoiceDirectorCandidates(storeId: StoreId, date: Date) {
@@ -150,13 +161,26 @@ export function getNonInvoiceDirectorCandidates(storeId: StoreId, date: Date) {
   const day = date.getDate()
   const monthName = date.toLocaleString('default', { month: 'long' })
   const storeInfo = `${storeId.slice(1)} ${storeNameMap[storeId]}`
-  return defaultNonInvoicePathTemplates.map(template =>
-    template
-      .replace('{storeInfo}', storeInfo)
-      .replace('{storeName}', storeNameMap[storeId])
-      .replace('{year}', year.toString())
-      .replace('{month}', month.toString().padStart(2, '0'))
-      .replace('{monthName}', monthName)
-      .replace('{day}', day.toString())
-  )
+
+  const dayVariants = [day.toString(), day.toString().padStart(2, '0')]
+  const monthVariants = [month.toString(), month.toString().padStart(2, '0')]
+
+  const candidates: string[] = []
+  for (const template of defaultNonInvoicePathTemplates) {
+    for (const d of dayVariants) {
+      for (const m of monthVariants) {
+        candidates.push(
+          template
+            .replace('{storeInfo}', storeInfo)
+            .replace('{storeName}', storeNameMap[storeId])
+            .replace('{year}', year.toString())
+            .replace('{month}', m)
+            .replace('{monthName}', monthName)
+            .replace('{day}', d)
+        )
+      }
+    }
+  }
+
+  return candidates
 }
