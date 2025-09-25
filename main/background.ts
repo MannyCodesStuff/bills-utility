@@ -1314,13 +1314,7 @@ function setupAutoUpdaterEvents() {
       }
 
       if (documentType === 'invoice') {
-        if (
-          !vendorId ||
-          !invoiceNumber ||
-          !invoiceDate ||
-          !store ||
-          !invoiceTotal
-        ) {
+        if (!vendorId || !invoiceNumber || !invoiceDate || !store) {
           return {
             success: false,
             error: 'Missing required parameters for invoice'
