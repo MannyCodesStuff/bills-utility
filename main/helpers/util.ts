@@ -64,10 +64,12 @@ export async function insertInvoiceToDatabase(
       .input('sharepoint_url', mssql.VarChar(255), fileUrl)
       .input('original_path', mssql.VarChar(500), originalPath)
       .input('store', mssql.VarChar(4), store)
-      .input('invoice_total', mssql.Money, invoiceTotal)
-      .query(
-        'INSERT INTO LOCDATAMART.dbo.SHAREPOINT_INVOICES (vendor_id, invoice_number, invoice_date, sharepoint_url, original_path, uploaded, store, invoice_total) VALUES (@vendor_id, @invoice_number, @invoice_date, @sharepoint_url, @original_path, 0, @store, @invoice_total)'
-      )
+      .input('invoice_total', mssql.Money, invoiceTotal).query(`
+          INSERT INTO LOCDATAMART.dbo.SHAREPOINT_INVOICES 
+            (vendor_id, invoice_number, invoice_date, sharepoint_url, original_path, uploaded, store, invoice_total, F253) 
+          VALUES 
+            (@vendor_id, @invoice_number, @invoice_date, @sharepoint_url, @original_path, 0, @store, @invoice_total, GETDATE())
+        `)
 
     return { sucess: true, message: 'Invoice inserted into database' }
   } catch (error) {
