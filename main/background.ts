@@ -1384,7 +1384,7 @@ function setupAutoUpdaterEvents() {
   // Handle getting PDF files from a directory
   ipcMain.handle('get-pdf-files', async (_, directoryPath: string) => {
     try {
-      // Check if directory exists
+      // Verify directory exists and is a directory
       if (!fs.existsSync(directoryPath)) {
         return {
           success: false,
@@ -1392,10 +1392,8 @@ function setupAutoUpdaterEvents() {
           folderExists: false
         }
       }
-
-      // Check if path is actually a directory
-      const stats = fs.statSync(directoryPath)
-      if (!stats.isDirectory()) {
+      const dirStats = fs.statSync(directoryPath)
+      if (!dirStats.isDirectory()) {
         return {
           success: false,
           error: 'Path is not a directory',
@@ -1403,37 +1401,54 @@ function setupAutoUpdaterEvents() {
         }
       }
 
-      // Read directory contents
-      const files = fs.readdirSync(directoryPath)
+      // Read entries with types to avoid stat on directories
+      const entries = fs.readdirSync(directoryPath, { withFileTypes: true })
 
-      // Filter for PDF files and get full file information
-      const pdfFiles = files
-        .filter(
-          file =>
-            path.extname(file).toLowerCase() === '.pdf' &&
-            !file.startsWith('~$')
-        )
-        .map(file => {
-          const filePath = path.join(directoryPath, file)
-          const fileStats = fs.statSync(filePath)
-
-          return {
-            name: file,
-            path: filePath,
-            size: fileStats.size,
-            modified: fileStats.mtime,
-            created: fileStats.birthtime
+      const skipped: Array<{ name: string; reason: string }> = []
+      const pdfFiles = entries
+        .filter(d => d.isFile())
+        .map(d => d.name)
+        .filter(name => {
+          // ignore temp/hidden/systemy stuff
+          if (name.startsWith('~$')) return false
+          if (
+            name.toLowerCase() === 'thumbs.db' ||
+            name.toLowerCase() === 'desktop.ini'
+          )
+            return false
+          return path.extname(name).toLowerCase() === '.pdf'
+        })
+        .map(name => {
+          const filePath = path.join(directoryPath, name)
+          try {
+            const st = fs.statSync(filePath) // can throw EPERM if locked or no permission
+            return {
+              name,
+              path: filePath,
+              size: st.size,
+              modified: st.mtime,
+              created: st.birthtime
+            }
+          } catch (e: any) {
+            // Collect and skip files we can't stat (EPERM/EBUSY/ENOENT/etc)
+            skipped.push({
+              name,
+              reason: `${e.code || 'ERROR'}: ${e.message || 'stat failed'}`
+            })
+            return null
           }
         })
-        .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically by name
+        .filter(Boolean)
+        .sort((a: any, b: any) => a.name.localeCompare(b.name))
 
       return {
         success: true,
         files: pdfFiles,
         count: pdfFiles.length,
+        skipped, // <— helpful for debugging which ones failed
         folderExists: true
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error reading PDF files from directory:', error)
       return {
         success: false,
