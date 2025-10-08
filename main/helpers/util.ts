@@ -52,7 +52,9 @@ export async function insertInvoiceToDatabase(
   fileUrl,
   originalPath,
   store,
-  invoiceTotal
+  invoiceTotal,
+  isCredit,
+  isInvoice
 ) {
   try {
     const pool = await mssql.connect(dbConfig)
@@ -64,11 +66,13 @@ export async function insertInvoiceToDatabase(
       .input('sharepoint_url', mssql.VarChar(255), fileUrl)
       .input('original_path', mssql.VarChar(500), originalPath)
       .input('store', mssql.VarChar(4), store)
+      .input('is_credit', mssql.Bit, isCredit)
+      .input('is_invoice', mssql.Bit, isInvoice)
       .input('invoice_total', mssql.Money, invoiceTotal).query(`
           INSERT INTO LOCDATAMART.dbo.SHAREPOINT_INVOICES 
-            (vendor_id, invoice_number, invoice_date, sharepoint_url, original_path, uploaded, store, invoice_total, F253) 
+            (vendor_id, invoice_number, invoice_date, sharepoint_url, original_path, uploaded, store, invoice_total, F253, is_credit, is_invoice) 
           VALUES 
-            (@vendor_id, @invoice_number, @invoice_date, @sharepoint_url, @original_path, 0, @store, @invoice_total, GETDATE())
+            (@vendor_id, @invoice_number, @invoice_date, @sharepoint_url, @original_path, 0, @store, @invoice_total, GETDATE(), @is_credit, @is_invoice)
         `)
 
     return { sucess: true, message: 'Invoice inserted into database' }

@@ -1358,7 +1358,9 @@ function setupAutoUpdaterEvents() {
           fileUrl,
           filePath,
           store,
-          invoiceTotal
+          invoiceTotal,
+          documentType === 'credit-memo',
+          documentType === 'invoice'
         )
 
         if (result.success === false) {
