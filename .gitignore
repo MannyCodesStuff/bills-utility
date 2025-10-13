@@ -12,8 +12,6 @@ next-env.d.ts
 # build
 /application_build
 dist
-app
-/app
 
 # Allow resources directory but ignore downloaded node binaries
 resources/node/
