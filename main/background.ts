@@ -162,9 +162,17 @@ function getSettings() {
 // fetch vendors from database
 async function fetchVendors() {
   const pool = await mssql.connect(dbConfig)
-  const result = await pool
-    .request()
-    .query('select F27 as id, F334 as name from STORESQL.dbo.VENDOR_TAB')
+  const result = await pool.request().query(`select 
+	VEN.F27 as id, 
+	F334 as [name],
+	CASE
+		WHEN ASN.F27 IS NULL THEN 0
+		ELSE 1
+	END as [asn_flag]
+from STORESQL.dbo.VENDOR_TAB VEN
+LEFT JOIN (
+	SELECT distinct F27 FROM LOCDATAMART.dbo.KRAS_RECV_SAV group by F27
+) ASN ON ASN.F27=VEN.F27`)
   return result.recordset
 }
 

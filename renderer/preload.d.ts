@@ -9,7 +9,9 @@ export interface IpcHandler {
   getDefaultDirectory: () => Promise<string>
   setDefaultDirectory: (directory: string) => Promise<boolean>
   getServerPort: () => Promise<number>
-  getVendors: () => Promise<Array<{ id: string; name: string }>>
+  getVendors: () => Promise<
+    Array<{ id: string; name: string; asn_flag: number }>
+  >
   getASNs: (
     storeId: string,
     vendorId: string,

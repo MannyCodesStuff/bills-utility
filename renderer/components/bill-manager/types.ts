@@ -6,6 +6,7 @@ export type PdfFile = {
 export type Vendor = {
   id: string
   name: string
+  asn_flag: number
 }
 
 export type Asn = {

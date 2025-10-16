@@ -263,7 +263,8 @@ export function BillManager2() {
       const invoiceNumber = data.invoiceNumber
       const invoiceDate = formattedDate
       // const documentType = data.documentType
-      const newFileName = `${vendorId}_${invoiceNumber}_${invoiceDate}.pdf`
+      const asnFlag = vendors.find(vendor => vendor.id === vendorId)?.asn_flag
+      const newFileName = `${vendorId}_${invoiceNumber}_${invoiceDate}${asnFlag ? '_ASN' : ''}.pdf`
       // const originalPath = selectedPdf.originalPath
 
       // Step 1: Rename file

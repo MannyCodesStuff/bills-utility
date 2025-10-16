@@ -11,32 +11,6 @@ export const renameFile = async (data: {
   invoiceNumber?: string
   invoiceDate?: string
 }) => {
-  // const response = await fetch(
-  //   `http://localhost:${serverPort}/rename-document`,
-  //   {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       ...data
-  //     })
-  //   }
-  // )
-
-  // if (!response.ok) {
-  //   const errorData = await response.json()
-  //   return {
-  //     error: true,
-  //     message: `Rename failed: ${errorData.message || 'Failed to rename file'}`
-  //   }
-  // }
-
-  // const result = await response.json()
-  // return {
-  //   success: true,
-  //   data: result
-  // }
   if (typeof window !== 'undefined' && window.ipc) {
     const response = await window.ipc.renameDocument(data)
     if (response.success) {
