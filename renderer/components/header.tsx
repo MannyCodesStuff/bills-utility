@@ -126,43 +126,43 @@ export const Header = () => {
     setPdfFiles([])
   }
 
-  const handleDateChange = async (newDate: Date) => {
-    if (storeId) {
-      setDate(newDate)
+  // const handleDateChange = async (newDate: Date) => {
+  //   if (storeId) {
+  //     setDate(newDate)
 
-      let existingDirectories: {
-        scans: string
-        bills: string
-        'non-invoice': string
-      } = {
-        scans: '',
-        bills: '',
-        'non-invoice': ''
-      }
+  //     let existingDirectories: {
+  //       scans: string
+  //       bills: string
+  //       'non-invoice': string
+  //     } = {
+  //       scans: '',
+  //       bills: '',
+  //       'non-invoice': ''
+  //     }
 
-      if (typeof window !== 'undefined' && window.ipc) {
-        existingDirectories = await window.ipc.getExistingDirectories(
-          storeId,
-          newDate
-        )
-        console.log({ existingDirectories })
-      }
+  //     if (typeof window !== 'undefined' && window.ipc) {
+  //       existingDirectories = await window.ipc.getExistingDirectories(
+  //         storeId,
+  //         newDate
+  //       )
+  //       console.log({ existingDirectories })
+  //     }
 
-      setDirectoryPaths({
-        scans: existingDirectories.scans,
-        bills: existingDirectories.bills,
-        'non-invoice': existingDirectories['non-invoice']
-      })
-      setSelectedPdf(null)
-      setDirectoryExists({
-        scans: false,
-        bills: false,
-        'non-invoice': false
-      })
-    } else {
-      toast.error('Please select a store first')
-    }
-  }
+  //     setDirectoryPaths({
+  //       scans: existingDirectories.scans,
+  //       bills: existingDirectories.bills,
+  //       'non-invoice': existingDirectories['non-invoice']
+  //     })
+  //     setSelectedPdf(null)
+  //     setDirectoryExists({
+  //       scans: false,
+  //       bills: false,
+  //       'non-invoice': false
+  //     })
+  //   } else {
+  //     toast.error('Please select a store first')
+  //   }
+  // }
 
   // const handleTest = async () => {
   //   console.log('clicked test')
@@ -232,12 +232,6 @@ export const Header = () => {
             </Command>
           </PopoverContent>
         </Popover>
-        <DatePicker
-          date={date}
-          handleDateChange={handleDateChange}
-          className="w-64"
-        />
-        {/* <Button onClick={handleTest}>Test</Button> */}
       </div>
     </header>
   )

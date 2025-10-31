@@ -44,32 +44,6 @@ export const uploadFileToSharePoint = async (data: {
   store: StoreId
   invoiceTotal: number
 }) => {
-  // const uploadResponse = await fetch(
-  //   `http://localhost:${serverPort}/upload-pdf`,
-  //   {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       ...data
-  //     })
-  //   }
-  // )
-
-  // if (!uploadResponse.ok) {
-  //   const errorData = await uploadResponse.json()
-  //   return {
-  //     error: true,
-  //     message: `Upload failed: ${errorData.message || 'Failed to upload file to SharePoint'}`
-  //   }
-  // }
-
-  // const uploadResult = await uploadResponse.json()
-  // return {
-  //   success: true,
-  //   data: uploadResult
-  // }
   if (typeof window !== 'undefined' && window.ipc) {
     const response = await window.ipc.uploadPdf(data)
     if (response.success) {
@@ -103,32 +77,6 @@ export const moveFileToZDrive = async (data: {
       message: string
     }
 > => {
-  // const moveResponse = await fetch(
-  //   `http://localhost:${serverPort}/move-file-to-zdrive`,
-  //   {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       ...data
-  //     })
-  //   }
-  // )
-
-  // if (!moveResponse.ok) {
-  //   const errorData = await moveResponse.json()
-  //   return {
-  //     error: true,
-  //     message: `Move failed: ${errorData.message || 'Failed to move file to ZDrive'}`
-  //   }
-  // }
-
-  // const moveResult = await moveResponse.json()
-  // return {
-  //   success: true,
-  //   data: moveResult
-  // }
   if (typeof window !== 'undefined' && window.ipc) {
     const response = await window.ipc.moveFileToZDrive(data)
     if (response.success) {
