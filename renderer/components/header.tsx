@@ -20,7 +20,6 @@ import {
   PopoverTrigger
 } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import { DatePicker } from './ui/date-picker'
 import { StoreId, useStore } from '@/hooks/use-store'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -78,7 +77,6 @@ export const Header = () => {
     storeId,
     setStoreId,
     date,
-    setDate,
     setSelectedPdf,
     setDirectoryExists,
     setDirectoryPaths,
