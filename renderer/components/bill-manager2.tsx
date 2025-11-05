@@ -263,7 +263,10 @@ export function BillManager2() {
       const invoiceNumber = data.invoiceNumber
       const invoiceDate = formattedDate
       // const documentType = data.documentType
-      const asnFlag = vendors.find(vendor => vendor.id === vendorId)?.asn_flag
+      let asnFlag = vendors.find(vendor => vendor.id === vendorId)?.asn_flag
+      if (vendorId === 'CONSOLID_SUPER') {
+        asnFlag = 1
+      }
       const newFileName = `${vendorId}_${invoiceNumber}_${invoiceDate}${asnFlag ? '_ASN' : ''}.pdf`
       // const originalPath = selectedPdf.originalPath
 
