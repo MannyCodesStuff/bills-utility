@@ -1,7 +1,7 @@
 {
   "name": "bills-utility",
   "description": "Bills Utility App",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "author": "Manny Soto Ruiz <emmanuel@deciccos.com>",
   "main": "app/background.js",
   "license": "MIT",
