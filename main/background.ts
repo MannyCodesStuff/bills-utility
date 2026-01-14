@@ -126,8 +126,7 @@ function getExistingDirectory(storeId: StoreId, type: TabType, date: Date) {
     candidates = getBillsDirectorCandidates(storeId, date)
   } else if (type === 'non-invoice') {
     candidates = getNonInvoiceDirectorCandidates(storeId, date)
-  }
-  if (type === 'non-invoice') {
+    console.log('non-invoice candidates:')
     console.log(candidates)
   }
 

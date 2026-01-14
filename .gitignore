@@ -37,3 +37,5 @@ create-certificate.ps1
 INSTALLATION_GUIDE.md
 create-certificate.ps1
 setup-environment-variables.ps1
+
+/app
