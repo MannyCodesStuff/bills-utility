@@ -11,7 +11,9 @@ export const storeNameMap: Record<StoreId, string> = {
   '4186': 'Somers',
   '4187': 'Eastchester',
   '4188': 'Bedford',
-  '4189': 'Sleepy Hollow'
+  '4189': 'Sleepy Hollow',
+  '4190': 'Greenwich',
+  '4191': 'Scarsdale',
 }
 
 const defaultScansPathTemplates = [
