@@ -14,6 +14,7 @@ export type StoreId =
   | '4187'
   | '4188'
   | '4189'
+  | '4190'
 
 interface StoreState {
   storeId?: StoreId
